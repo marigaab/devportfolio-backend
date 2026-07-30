@@ -19,12 +19,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Executar Build Automatizado
-        run: |
-          if [ -d "portfolio-api" ]; then
-            cd portfolio-api
-          fi
-          mvn clean package -DskipTests
+      - name: Entrar na pasta e Compilar com Maven
+        working-directory: portfolio-api
+        run: mvn clean package -DskipTests
 
       - name: Análise Estática / Lint Simulado
         run: echo "Análise de Qualidade concluída com sucesso!"
