@@ -1,7 +1,7 @@
 # Etapa 1: Build (Compilação com Java 25)
 FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
-COPY portfolio-api /app
+COPY portifolio-api /app
 RUN mvn clean package -DskipTests
 
 # Etapa 2: Execução leve (JRE 25)

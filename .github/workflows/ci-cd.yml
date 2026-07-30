@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Entrar na pasta e Compilar com Maven
-        working-directory: portfolio-api
+        working-directory: portifolio-api
         run: mvn clean package -DskipTests
 
       - name: Análise Estática / Lint Simulado
