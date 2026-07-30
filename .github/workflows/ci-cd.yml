@@ -13,16 +13,17 @@ jobs:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Configurar JDK 25
+      - name: Configurar JDK Java
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'temurin'
-          check-latest: true
+
+      - name: Dar permissão de execução ao Maven Wrapper (se houver)
+        run: chmod +x portfolio-api/mvnw || true
 
       - name: Executar Testes Unitários e Build Automatizado
-        working-directory: ./portfolio-api
-        run: mvn clean package
+        run: mvn clean package -f portfolio-api/pom.xml
 
       - name: Análise Estática / Lint Simulado
         run: echo "Análise de Qualidade concluída com sucesso!"
