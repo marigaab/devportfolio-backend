@@ -40,7 +40,7 @@ jobs:
   # ==========================================
   cd-backend:
     name: 🚀 CD - Push da Imagem & Deploy na OCI
-    needs: ci-backend # Só executa se o CI passar com sucesso
+    needs: ci-backend
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Pipeline'
     runs-on: ubuntu-latest
 
@@ -58,7 +58,8 @@ jobs:
       - name: Build e Push da Imagem Docker
         uses: docker/build-push-action@v5
         with:
-          context: ./portifolio-api
+          context: .              # <-- Aponta para a RAIZ do repositório
+          file: ./Dockerfile      # <-- Especifica o Dockerfile na raiz
           push: true
           tags: ${{ env.IMAGE_NAME }}
 
