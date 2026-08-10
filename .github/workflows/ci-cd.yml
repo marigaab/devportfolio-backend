@@ -6,9 +6,18 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/devportfolio-backend:latest
+
 jobs:
-  build-and-test:
+  # ==========================================
+  # ETAPA 1: CI (Continuous Integration)
+  # ==========================================
+  ci-backend:
+    name: 🧪 CI - Build & Qualidade Backend
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
@@ -19,9 +28,48 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Entrar na pasta e Compilar com Maven
+      - name: Compilar com Maven
         working-directory: portifolio-api
         run: mvn clean package -DskipTests
 
       - name: Análise Estática / Lint Simulado
         run: echo "Análise de Qualidade concluída com sucesso!"
+
+  # ==========================================
+  # ETAPA 2: CD (Continuous Deployment)
+  # ==========================================
+  cd-backend:
+    name: 🚀 CD - Push da Imagem & Deploy na OCI
+    needs: ci-backend # Só executa se o CI passar com sucesso
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Pipeline'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Login no GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e Push da Imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: ./portifolio-api
+          push: true
+          tags: ${{ env.IMAGE_NAME }}
+
+      - name: Deploy Remoto na Oracle Cloud via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 147.15.78.144
+          username: opc
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/opc/app
+            docker compose pull devportfolio-backend
+            docker compose up -d --no-deps devportfolio-backend
+            docker image prune -f
