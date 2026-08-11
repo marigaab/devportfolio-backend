@@ -77,5 +77,5 @@ jobs:
           script: |
             cd /home/opc/app
             docker compose pull devportfolio-backend
-            docker compose up -d --no-deps devportfolio-backend
+            docker compose up -d --no-deps --force-recreate devportfolio-backend
             docker image prune -f
